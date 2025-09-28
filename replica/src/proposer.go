@@ -2,6 +2,7 @@ package raxos
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"raxos/proto/client"
 	"sync"
@@ -15,6 +16,7 @@ type Proposer struct {
 	name                        int64  // unique
 	threadId                    int64  // unique
 	peers                       []peer // gRPC connection list
+	peerNames                   []int64
 	proxyToProposerChan         chan ProposeRequest
 	proposerToProxyChan         chan ProposeResponse
 	proxyToProposerFetchChan    chan FetchRequest
@@ -54,6 +56,11 @@ func NewProposer(name int64, threadId int64, peers []peer, proxyToProposerChan c
 		asynchronousReplicas:        make(map[int][]int),
 		timeEpochSize:               timeEpochSize,
 		startTime:                   time.Now(),
+	}
+
+	pr.peerNames = make([]int64, len(pr.peers))
+	for i, p := range pr.peers {
+		pr.peerNames[i] = p.name
 	}
 
 	if pr.isAsynchronous {
@@ -466,6 +473,7 @@ func (prop *Proposer) handleProposeRequest(message ProposeRequest) ProposeRespon
 					}
 
 					if resp != nil && resp.S > 0 {
+						resp.peer = p.name
 						responses <- resp
 						//prop.debug("proposer received a rpc response for instance "+strconv.Itoa(int(message.instance)), 0)
 					}
@@ -488,6 +496,7 @@ func (prop *Proposer) handleProposeRequest(message ProposeRequest) ProposeRespon
 					}
 
 					if resp != nil && resp.S > 0 {
+						resp.peer = p.name
 						responses <- resp
 						//prop.debug("proposer received a rpc response for instance "+strconv.Itoa(int(message.instance)), 0)
 					}
@@ -504,18 +513,46 @@ func (prop *Proposer) handleProposeRequest(message ProposeRequest) ProposeRespon
 			close(responses)
 		}()
 
-		responsesArray := make([]RecorderResponse, 0)
+		rand.Seed(message.instance)
+		numToWaitFor := prop.numReplicas/2 + 1
+		shuffledNames := make([]int64, len(prop.peerNames))
+		copy(shuffledNames, prop.peerNames)
+
+		rand.Shuffle(len(shuffledNames), func(i, j int) {
+			shuffledNames[i], shuffledNames[j] = shuffledNames[j], shuffledNames[i]
+		})
+
+		requiredIndicesMap := make(map[int64]struct{}) // Using struct{} is memory-efficient
+		for i := 0; i < numToWaitFor; i++ {
+			requiredIndicesMap[shuffledNames[i]] = struct{}{}
+		}
+
+		fmt.Println(requiredIndicesMap)
+		responsesArray := make([]RecorderResponse, 0, numToWaitFor)
 		for r := range responses {
-			responsesArray = append(responsesArray, *r)
-			// close the channel once a majority of the replies are collected
+			fmt.Println(r.peer)
+			if _, ok := requiredIndicesMap[r.peer]; ok {
+				responsesArray = append(responsesArray, *r)
+			}
+
 			if len(responsesArray) == (prop.numReplicas/2)+1 {
-				if len(responsesArray) != (prop.numReplicas/2)+1 {
-					panic("should not happen")
-				}
 				break
 			}
 		}
-
+		/*
+			responsesArray := make([]RecorderResponse, 0)
+			for r := range responses {
+				responsesArray = append(responsesArray, *r)
+				fmt.Println(r.peer)
+				// close the channel once a majority of the replies are collected
+				if len(responsesArray) == (prop.numReplicas/2)+1 {
+					if len(responsesArray) != (prop.numReplicas/2)+1 {
+						panic("should not happen")
+					}
+					break
+				}
+			} */
+		//fmt.Println(responsesArray)
 		if len(responsesArray) < (prop.numReplicas/2)+1 {
 			panic("should this happen?")
 		}

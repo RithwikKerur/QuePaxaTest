@@ -7,10 +7,11 @@
 package raxos
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -108,6 +109,7 @@ type RecorderResponse struct {
 	F                     *RecorderResponse_Proposal `protobuf:"bytes,2,opt,name=F,proto3" json:"F,omitempty"`                                          // first proposal
 	M                     *RecorderResponse_Proposal `protobuf:"bytes,3,opt,name=M,proto3" json:"M,omitempty"`                                          // the maximum of all values (v) proposed in the prior epoch for S-1
 	ClientBatchesNotFound bool                       `protobuf:"varint,4,opt,name=ClientBatchesNotFound,proto3" json:"ClientBatchesNotFound,omitempty"` // if any of the client batches are not found, set this to true
+	peer                  int64
 }
 
 func (x *RecorderResponse) Reset() {

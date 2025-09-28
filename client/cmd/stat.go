@@ -121,6 +121,7 @@ func (cl *Client) computeStats() {
 	}
 
 	medianLatency, _ := stats.Median(cl.getFloat64List(throughputList))
+	meanLatency, _ := stats.Mean(cl.getFloat64List(throughputList))
 	percentile99, _ := stats.Percentile(cl.getFloat64List(throughputList), 99.0) // tail latency
 	duration := cl.testDuration
 	errorRate := (numTotalSentRequests - numSuccess) * 100.0 / numTotalSentRequests
@@ -128,6 +129,7 @@ func (cl *Client) computeStats() {
 	fmt.Printf("Total time := %v seconds\n", duration)
 	fmt.Printf("Throughput := %v requests per second\n", numSuccess/int(duration))
 	fmt.Printf("Median Latency := %v micro seconds per request\n", medianLatency)
+	fmt.Printf("Mean Latency := %v micro seconds per request\n", meanLatency)
 	fmt.Printf("99 pecentile latency := %v micro seconds per request\n", percentile99)
 	fmt.Printf("Error Rate := %v \n", float64(errorRate))
 }
