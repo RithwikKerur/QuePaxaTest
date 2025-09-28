@@ -22,12 +22,12 @@ rm -r "${output_path}" ; mkdir -p "${output_path}"
 
 echo "Removed old log files"
 
-pkill replica;
+pkill replica; 
 pkill client; 
 
 echo "Killed previously running instances"
 
-nohup ./${raxos_path} --name 2 --isAsync --asyncTimeOut ${asynchronousSimulationTime} --debugOn --debugLevel 200 --batchSize "${batchSize}" --batchTime  "${batchTime}" --leaderTimeout "${leaderTimeout}" --pipelineLength "${pipeline}" --leaderMode "${leaderMode}" --serverMode "${serverMode}" --requestPropagationTime "${requestPropagationTime}" --logFilePath "${output_path}" >${output_path}2.log
+nohup ./${raxos_path} --name 5 --isAsync --asyncTimeOut ${asynchronousSimulationTime} --debugOn --debugLevel 200 --batchSize "${batchSize}" --batchTime  "${batchTime}" --leaderTimeout "${leaderTimeout}" --pipelineLength "${pipeline}" --leaderMode "${leaderMode}" --serverMode "${serverMode}" --requestPropagationTime "${requestPropagationTime}" --logFilePath "${output_path}" >${output_path}5.log
 
 echo "Started 5 servers"
 
@@ -37,7 +37,7 @@ sleep 12
 
 echo "Starting client[s]"
 
-nohup ./${ctl_path} --name 22 --debugOn --debugLevel 100 --requestType request --arrivalRate "${arrivalRate}"  --batchSize "${batchSize}" --batchTime "${batchTime}" --window "${closeLoopWindow}" --logFilePath "${output_path}"  >${output_path}22.log 
+nohup ./${ctl_path} --name 25 --debugOn --debugLevel 100 --requestType request --arrivalRate "${arrivalRate}"  --batchSize "${batchSize}" --batchTime "${batchTime}" --window "${closeLoopWindow}" --logFilePath "${output_path}"  >${output_path}25.log 
 
 sleep 100
 

@@ -12,7 +12,7 @@ asynchronousSimulationTime=${10}
 # create a new local configuration
 rm -r configuration/local
 mkdir -p configuration/local
-python3 configuration/config-generate.py 4 4 128.105.146.0 128.105.145.238 128.110.216.211 128.110.216.210 128.105.146.0 128.105.145.238 128.110.216.211 128.110.216.210 > configuration/local/configuration.yml
+python3 configuration/config-generate.py 5 5 128.105.146.0 128.105.145.238 128.110.216.211 128.110.216.210 198.22.255.17 128.105.146.0 128.105.145.238 128.110.216.211 128.110.216.210 198.22.255.17 > configuration/local/configuration.yml
 
 raxos_path="replica/bin/replica"
 ctl_path="client/bin/client"
