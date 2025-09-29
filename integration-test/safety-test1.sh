@@ -27,7 +27,7 @@ pkill client;
 
 echo "Killed previously running instances"
 
-nohup ./${raxos_path} --name 1 --isAsync --asyncTimeOut ${asynchronousSimulationTime} --debugOn --debugLevel 200 --batchSize "${batchSize}" --batchTime  "${batchTime}" --leaderTimeout "${leaderTimeout}" --pipelineLength "${pipeline}" --leaderMode "${leaderMode}" --serverMode "${serverMode}" --requestPropagationTime "${requestPropagationTime}" --logFilePath "${output_path}" >${output_path}1.log
+nohup ./${raxos_path} --name 1 --isAsync --asyncTimeOut ${asynchronousSimulationTime} --debugOn --debugLevel 200 --batchSize "${batchSize}" --batchTime  "${batchTime}" --leaderTimeout "${leaderTimeout}" --pipelineLength "${pipeline}" --leaderMode "${leaderMode}" --serverMode "${serverMode}" --requestPropagationTime "${requestPropagationTime}" --logFilePath "${output_path}" >${output_path}1.log & 
 
 echo "Started 5 servers"
 
@@ -37,7 +37,7 @@ sleep 12
 
 echo "Starting client[s]"
 
-nohup ./${ctl_path} --name 21 --debugOn --debugLevel 100 --requestType request --arrivalRate "${arrivalRate}"  --batchSize "${batchSize}" --batchTime "${batchTime}" --window "${closeLoopWindow}" --logFilePath "${output_path}"  >${output_path}21.log 
+nohup ./${ctl_path} --name 21 --debugOn --debugLevel 100 --requestType request --arrivalRate "${arrivalRate}"  --batchSize "${batchSize}" --batchTime "${batchTime}" --window "${closeLoopWindow}" --logFilePath "${output_path}"  >${output_path}21.log & 
 
 sleep 100
 

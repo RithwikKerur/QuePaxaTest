@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/montanaflynn/stats"
 	"log"
 	"os"
 	"raxos/proto/client"
 	"strconv"
 	"sync"
+
+	"github.com/montanaflynn/stats"
 )
 
 // this file defines the statistics calculation of the client, after the test. The client outputs median latency, throughput, error rate and tail latency
@@ -15,7 +16,7 @@ import (
 const CLIENT_TIMEOUT = 2000000 // this is the maximum client side timeout
 
 /*
-	iteratively calculate the number of elements in the 2d array
+iteratively calculate the number of elements in the 2d array
 */
 func (cl *Client) getNumberOfSentRequests(requests [][]sentRequestBatch) int {
 	count := 0
@@ -88,6 +89,7 @@ func (cl *Client) computeStats() {
 	defer f.Close()
 
 	numTotalSentRequests := cl.getNumberOfSentRequests(cl.sentRequests)
+	fmt.Printf("Num Total Sent Requests %d \n", numTotalSentRequests)
 	var throughputList []int64 // contains the time duration spent for requests
 	numSuccess := 0
 	for i := 0; i < numRequestGenerationThreads; i++ {
@@ -102,6 +104,7 @@ func (cl *Client) computeStats() {
 				endTime := responseBatch.time
 				batchLatency := endTime.Sub(startTime).Microseconds()
 				if batchLatency > CLIENT_TIMEOUT {
+					fmt.Printf("Greater than client timeout \n")
 					batchLatency := CLIENT_TIMEOUT
 					throughputList = cl.addValueNToArrayMTimes(throughputList, int64(batchLatency), len(batch.batch.Messages))
 					cl.printRequests(batch.batch, startTime.Sub(cl.startTime).Microseconds(), startTime.Sub(cl.startTime).Microseconds()+CLIENT_TIMEOUT, f)
